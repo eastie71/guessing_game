@@ -6,23 +6,41 @@ fn main() {
 
     let secret_number = rand::thread_rng().gen_range(1..=100);
     
-    println!("The secret number is: {}", secret_number);
+    //println!("The secret number is: {}", secret_number);
 
-    println!("Please enter your guess:");
+    loop {
+        println!("");
+        println!("Please enter your guess:");
 
-    let mut guess = String::new();
+        let mut guess = String::new();
 
-    io::stdin()
-        .read_line(&mut guess)   // &mut indicates a mutable reference
-        .expect("Failed to read line");
-    
-    let guess: u32 = guess.trim().parse().expect("Please type a number between 1 and 100");
-    println!("You guessed: {}", guess);
+        io::stdin()
+            .read_line(&mut guess)   // &mut indicates a mutable reference
+            .expect("Failed to read line");
+        
+        // Unhandled conversion will crash out here if guess is NAN
+        // let guess: u32 = guess.trim().parse().expect("Please type a number between 1 and 100");
 
-    match guess.cmp(&secret_number) {
-        Ordering::Less => println!("Too low!"),
-        Ordering::Greater => println!("Too high!"),
-        Ordering::Equal => println!("You got it!!")
+        // Handle conversion without crashing out
+        let guess: u32 = match guess.trim().parse() {
+            Ok(num) => num,
+            Err(_) => {
+                println!("Enter a number between 1 and 100");
+                continue;
+            }
+        };
+
+        println!("You guessed: {}", guess);
+
+        match guess.cmp(&secret_number) {
+            Ordering::Less => println!("Too low!"),
+            Ordering::Greater => println!("Too high!"),
+            Ordering::Equal => {
+                println!("You got it!!");
+                break;
+            }
+        }
     }
+    
 }
 
